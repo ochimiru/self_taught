@@ -19,18 +19,9 @@ def mouse_press(e):
     mouse_c = 1
 
 # マス目を管理する二次元リスト
-neko = [
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0]
-        ]
+neko = []
+for i in range(10):
+    neko.append([0,0,0,0,0,0,0,0])
 
 # ネコを描写する関数
 def draw_neko():
@@ -49,18 +40,13 @@ def yoko_neko():
                     neko[y][x] = 7
                     neko[y][x+1] = 7
 
-# ネコを落下させる関数
-def drop_neko():
-    for y in range(8, -1, -1):
-        for x in range(8):
-            if neko[y][x] != 0 and neko[y+1][x] == 0:
-                neko[y+1][x] = neko[y][x]
-                neko[y][x] = 0
 
 # リアルタイム処理を行う関数
 def game_main():
     global cursor_x, cursor_y, mouse_c
-    drop_neko()
+    if 660 <= mouse_x and mouse_x < 840 and 100 <= mouse_y and mouse_y < 160 and mouse_c ==1:
+        mouse_c = 0
+        yoko_neko()
     if 24 <= mouse_x and mouse_x < 24+72*8 and 24 <= mouse_y and mouse_y < 24+72*10:
         cursor_x = int((mouse_x-24) / 72)
         cursor_y = int((mouse_y-24) / 72)
@@ -95,6 +81,8 @@ img_neko = [
         ]
 
 cvs.create_image(456, 384, image=bg)
+cvs.create_rectangle(660, 100, 840, 160, fill="white")
+cvs.create_text(750, 130, text="test", fill="red", font=("Meiryo", 30))
 game_main()
 root.mainloop()
 
