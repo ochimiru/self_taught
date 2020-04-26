@@ -4,6 +4,8 @@ import random
 index = 0       # ゲーム進行を管理する変数
 timer = 0       # 時間を管理する変数
 score = 0       # スコア用の変数
+hisc = 1000
+difficulty = 0
 tsugi = 0       # 次にセットするネコの値を入れる変数
 
 cursor_x = 0        # カーソル横方向の位置
@@ -108,7 +110,7 @@ def over_neko():
 # 最上段にネコをセットする関数
 def set_neko():
     for x in range(8):
-        neko[0][x] = random.randint(0, 6)
+        neko[0][x] = random.randint(0, difficulty)
 
 # 影付きの文字列を表示する関数
 def draw_txt(txt, x, y, siz, col, tg):
@@ -118,15 +120,28 @@ def draw_txt(txt, x, y, siz, col, tg):
 
 # リアルタイム処理を行う関数
 def game_main():
-    global index, timer, score, tsugi
+    global index, timer, score, hisc, difficulty, tsugi 
     global cursor_x, cursor_y, mouse_c
     if index == 0:      # タイトルロゴ
         draw_txt("ねこねこ", 312, 240, 100, "violet", "TITLE")
-        draw_txt("Click to start", 312, 560, 50, "orange", "TITLE")
+        cvs.create_rectangle(168, 384, 456, 456, fill="skyblue", width=0, tag="TITLE")
+        draw_txt("Easy", 312, 420, 40, "white", "TITLE")
+        cvs.create_rectangle(168, 528, 456, 600, fill="lightgreen", width=0, tag="TITLE")
+        draw_txt("Normal", 312, 564, 40, "white", "TITLE")
+        cvs.create_rectangle(168, 672, 456, 744, fill="orange", width=0, tag="TITLE")
+        draw_txt("Hard", 312, 708, 40, "white", "TITLE")
         index = 1
         mouse_c = 0
     elif index == 1:     # タイトル画面　スタート待ち
+        difficulty = 0
         if mouse_c == 1:
+            if 168 < mouse_x and mouse_x < 456 and 384 < mouse_y and mouse_y < 456:
+                difficulty = 4
+            if 168 < mouse_x and mouse_x < 456 and 528 < mouse_y and mouse_y < 600:
+                difficulty = 5
+            if 168 < mouse_x and mouse_x < 456 and 672 < mouse_y and mouse_y < 744:
+                difficulty = 6
+        if difficulty > 0:
             for y in range(10):
                 for x in range(8):
                     neko[y][x] = 0
@@ -149,12 +164,14 @@ def game_main():
         index = 4
     elif index == 4:     # 揃ったネコがあれば消す
         sc = sweep_neko()
-        score += sc*10
+        score += sc*difficulty*2
+        if score > hisc:
+            hisc = score
         if sc > 0:
             index = 2
         else:
             if over_neko() == False:
-                tsugi = random.randint(1, 6)
+                tsugi = random.randint(1, difficulty)
                 index = 5
             else:
                 index = 6
@@ -182,6 +199,7 @@ def game_main():
             index = 0
     cvs.delete("INFO")
     draw_txt("SCORE" + str(score), 160, 60, 32, "blue", "INFO")
+    draw_txt("HISC" + str(hisc), 450, 60, 32, "yellow", "INFO")
     if tsugi > 0:
         cvs.create_image(752, 128, image=img_neko[tsugi], tag="INFO")
     root.after(100, game_main)
